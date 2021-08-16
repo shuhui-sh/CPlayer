@@ -8,9 +8,6 @@ add_library(
         SHARED
         ${SOURCE})
 
-find_library( # Sets the name of the path variable.
-        log-lib
-        log)
 
 #编译用到的头文件路径
 include_directories(src/main/cpp/include)
@@ -21,9 +18,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${my_lib_path}")
 
 target_link_libraries(
         cplayer
-        avfilter avformat avcodec avutil swresample swscale
-        ${log-lib}
-        android
+        -Wl,--start-group
+        avcodec avfilter avformat avutil swresample swscale
+        -Wl,--end-group
+        log
         z
         OpenSLES
+        android
 )
