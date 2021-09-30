@@ -10,7 +10,7 @@
 class VideoChannel : public BaseChannel {
 
 public:
-    VideoChannel();
+    VideoChannel(int i);
 
 
     ~VideoChannel();

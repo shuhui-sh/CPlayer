@@ -2,6 +2,8 @@
 #include <string>
 #include <android/native_window_jni.h>
 #include <zconf.h>
+#include "JavaCallHelper.h"
+#include "CFFmpeg.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -116,4 +118,30 @@ Java_com_csh_cplayer_CPlayer_native_1play_1video(JNIEnv *env, jobject instance,
     avcodec_close(avCodecContext);
     avformat_free_context(formatContext);
     env->ReleaseStringUTFChars(path_, path);
+}
+
+JavaCallHelper *javaCallHelper = 0;
+JavaVM *javaVm = 0;
+
+jint  JNI_OnLoad(JavaVM *vm, void *reserved)  {
+    javaVm = vm;
+    return JNI_VERSION_1_4;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_csh_cplayer_NEPlayer_prepareNative(JNIEnv *env, jobject thiz, jstring data_source) {
+    // TODO: implement prepareNative()
+    const char *dataSource = env->GetStringUTFChars(data_source, 0);
+    javaCallHelper = new JavaCallHelper(javaVm, env, thiz);
+    CFFmpeg *cfFmpeg = new CFFmpeg(javaCallHelper, const_cast<char *>(dataSource));
+    cfFmpeg->prepare();
+
+    env->ReleaseStringUTFChars(data_source, dataSource);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_csh_cplayer_NEPlayer_startNative(JNIEnv *env, jobject thiz) {
+    // TODO: implement startNative()
 }

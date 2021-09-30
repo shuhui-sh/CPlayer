@@ -16,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private CPlayer mPlayer;
+    private NEPlayer nePlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +29,16 @@ public class MainActivity extends AppCompatActivity {
         mPlayer = new CPlayer();
 
         mPlayer.setSurfaceView(surfaceView);
+
+        nePlayer = new NEPlayer();
+        nePlayer.setDataSource(new File(
+                Environment.getExternalStorageDirectory() + File.separator + "xxxx.mp4").getAbsolutePath() );
+        nePlayer.setListener(new NEPlayer.MyErrorListener() {
+            @Override
+            public void onError(int errorCode) {
+
+            }
+        });
     }
 
     public void open(View view) {

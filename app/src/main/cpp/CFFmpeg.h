@@ -13,10 +13,14 @@
 #include "macro.h"
 #include "pthread.h"
 
+extern "C" {
+#include <libavformat/avformat.h>
+};
+
 class CFFmpeg {
 
 public:
-    CFFmpeg();
+    CFFmpeg(JavaCallHelper *javaCallHelper, char *dataSource);
 
     ~CFFmpeg();
 
@@ -26,12 +30,13 @@ public:
 
 
 private:
-
     JavaCallHelper *javaCallHelper = 0;
     AudioChannel *audioChannel = 0;
     VideoChannel *videoChannel = 0;
     char *dataSource;
     pthread_t pid_prepare;
+    bool isPlaying;
+    AVFormatContext *avFormatContext = 0;
 };
 
 #endif //CPLAYER_CFFMPEG_H

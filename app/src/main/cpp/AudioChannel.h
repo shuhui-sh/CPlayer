@@ -9,7 +9,7 @@
 
 class AudioChannel : public BaseChannel {
 public:
-    AudioChannel();
+    AudioChannel(int i);
 
     ~AudioChannel();
 };
