@@ -66,7 +66,7 @@ void CFFmpeg::_prepare() {
     }
 
     //这里的 i 就是后面 166行的 packet->stream_index
-    for(int i = 0; i < avFormatContext->nb_streams; ++i) {
+    for (int i = 0; i < avFormatContext->nb_streams; ++i) {
         //3获取媒体流（音频或视频）
         AVStream *stream = avFormatContext->streams[i];
         //4获取编解码这段流的参数
@@ -123,9 +123,59 @@ void CFFmpeg::prepare() {
     pthread_create(&pid_prepare, 0, task_prepare, this);
 }
 
+
 CFFmpeg::~CFFmpeg() {
     DELETE(dataSource);
     DELETE(javaCallHelper)
+}
+
+void *task_start(void *args) {
+    //参数就是调用的时候传进来的this,强转成CFFmpeg
+    CFFmpeg *cfFmpeg = static_cast<CFFmpeg *>(args);
+    //因为要使用私有的dataSource成员变量，这个线程执行方法不能直接访问，所以写一个public成员函数来访问
+    cfFmpeg->_start();
+    //一定一定一定要返回0！！！
+    return 0;
+}
+
+
+void CFFmpeg::start() {
+    isPlaying = 1;
+    pthread_create(&pid_start, 0, task_start, this);
+
+}
+
+/**
+ * 真正执行解码播放
+ */
+void CFFmpeg::_start() {
+    while (isPlaying) {
+        AVPacket *packet = av_packet_alloc();
+        int ret = av_read_frame(avFormatContext, packet);
+        if (!ret) {
+            //ret 为 0 表示成功
+            //要判断流类型，是视频还是音频
+            if (videoChannel && packet->stream_index == videoChannel->id) {
+                //往视频编码数据包队列中添加数据
+                videoChannel->packets.push(packet);
+            } else if (audioChannel && packet->stream_index == audioChannel->id) {
+                //往音频编码数据包队列中添加数据
+                //TODO
+//                audioChannel->packets.push(packet);
+            }
+        }else if (ret == AVERROR_EOF) {
+            //表示读完了
+            //要考虑读完了，是否播完了的情况
+            // TODO
+        } else {
+            //TODO 作业:反射通知java
+            LOGE("读取音视频数据包失败");
+            break;
+        }
+    }//end while
+
+    isPlaying = 0;
+    //停止解码播放（音频和视频）
 }
 
 

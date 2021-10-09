@@ -7,6 +7,8 @@ import android.view.SurfaceView;
 
 public class CPlayer implements SurfaceHolder.Callback {
     private SurfaceHolder surfaceHolder;
+    //直播地址或媒体文件路径
+    private String dataSource;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -38,9 +40,43 @@ public class CPlayer implements SurfaceHolder.Callback {
 
     }
 
-    public void playVideo(String path) {
-        native_play_video(path, surfaceHolder.getSurface());
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
+    /**
+     * 播放准备工作
+     */
+    public void prepare() {
+        prepareNative(dataSource);
     }
 
-    public native void native_play_video(String path, Surface surface);
+    /**
+     * 开始播放
+     */
+    public void start() {
+        startNative();
+    }
+
+    /**
+     * 供native反射调用
+     * 表示播放器准备好了可以开始播放了
+     */
+    public void onPrepared() {
+        if (onpreparedListener != null) {
+            onpreparedListener.onPrepared();
+        }
+    }
+
+    void setOnpreparedListener(OnpreparedListener onpreparedListener) {
+        this.onpreparedListener = onpreparedListener;
+    }
+
+    interface OnpreparedListener {
+        void onPrepared();
+    }
+
+    private OnpreparedListener onpreparedListener;
+
+    private native void prepareNative(String dataSource);
+    private native void startNative();
 }

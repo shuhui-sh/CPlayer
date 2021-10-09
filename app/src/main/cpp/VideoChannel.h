@@ -10,10 +10,14 @@
 class VideoChannel : public BaseChannel {
 
 public:
-    VideoChannel(int i);
+    VideoChannel(int id);
 
 
     ~VideoChannel();
+
+    virtual void start();
+
+    virtual void stop();
 
 };
 

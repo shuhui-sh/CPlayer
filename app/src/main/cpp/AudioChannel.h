@@ -9,9 +9,13 @@
 
 class AudioChannel : public BaseChannel {
 public:
-    AudioChannel(int i);
+    AudioChannel(int id);
 
     ~AudioChannel();
+
+    void start();
+
+    void stop();
 };
 
 #endif //CPLAYER_AUDIOCHANNEL_H

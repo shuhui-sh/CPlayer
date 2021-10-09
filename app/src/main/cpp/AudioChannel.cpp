@@ -4,10 +4,20 @@
 
 #include "AudioChannel.h"
 
-AudioChannel::AudioChannel(int i) {
+AudioChannel::AudioChannel(int id) : BaseChannel(id) {
 
 }
 
 AudioChannel::~AudioChannel() {
 
 }
+
+void AudioChannel::stop() {
+
+}
+
+void AudioChannel::start() {
+
+}
+
+
