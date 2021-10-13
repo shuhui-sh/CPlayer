@@ -30,11 +30,22 @@ public class CPlayer implements SurfaceHolder.Callback {
 
     }
 
+    /**
+     * 画布刷新
+     * @param holder
+     * @param format
+     * @param width
+     * @param height
+     */
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        this.surfaceHolder = holder;
+        setSurfaceNative(holder.getSurface());
     }
 
+    /**
+     * 画布销毁
+     * @param holder
+     */
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
 
@@ -79,4 +90,5 @@ public class CPlayer implements SurfaceHolder.Callback {
 
     private native void prepareNative(String dataSource);
     private native void startNative();
+    private native void setSurfaceNative(Surface surface);
 }

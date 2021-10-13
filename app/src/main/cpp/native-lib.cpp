@@ -16,6 +16,8 @@ extern "C" {
 JavaCallHelper *javaCallHelper = 0;
 JavaVM *javaVm = 0;
 CFFmpeg *cfFmpeg = 0;
+ANativeWindow *window = 0;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;//静态初始化mutex
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     javaVm = vm;
@@ -40,4 +42,17 @@ Java_com_csh_cplayer_CPlayer_startNative(JNIEnv *env, jobject thiz) {
     if (cfFmpeg) {
         cfFmpeg->start();
     }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_csh_cplayer_CPlayer_setSurfaceNative(JNIEnv *env, jobject thiz, jobject surface) {
+    pthread_mutex_lock(&mutex);
+    if (window) {
+        ANativeWindow_release(window);
+        window = 0;
+    }
+
+    window = ANativeWindow_fromSurface(env, surface);
+    pthread_mutex_unlock(&mutex);
 }
