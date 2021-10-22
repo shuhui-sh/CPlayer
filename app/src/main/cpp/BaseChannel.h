@@ -10,9 +10,11 @@
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavutil/frame.h>
+#include <libavutil/time.h>
 };
 
-
+#include "safe_queue.h"
+#include "JavaCallHelper.h"
 
 
 /**
@@ -24,8 +26,17 @@ public:
     SafeQueue<AVPacket *> packets;
     SafeQueue<AVFrame *> frames;
     int id;
+    bool isPlaying = 0;
+    //解码器上下文
+    AVCodecContext *codecContext;
+    AVRational time_base;
+    double audio_time;
+    JavaCallHelper *javaCallHelper = 0;
 
-    BaseChannel(int id) : id(id){
+    BaseChannel(int id, AVCodecContext *codecContext, AVRational time_base,
+                JavaCallHelper *javaCallHelper) : id(id), codecContext(codecContext),
+                                                  time_base(time_base),
+                                                  javaCallHelper(javaCallHelper) {
         packets.setReleaseCallback(releaseAVPacket);
         frames.setReleaseCallback(releaseAVFrame);
     }
@@ -54,11 +65,17 @@ public:
 
     //纯虚函数（抽象方法）
     virtual void start() = 0;
+
     virtual void stop() = 0;
 
     virtual ~BaseChannel() {
         packets.clear();
         frames.clear();
+        if (codecContext) {
+            avcodec_close(codecContext);
+            avcodec_free_context(&codecContext);
+            codecContext = 0;
+        }
     }
 
 };
